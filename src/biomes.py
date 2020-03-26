@@ -7,7 +7,7 @@
 from random import randint
 
 
-class Biome:
+class BiomeType:
 
     def __init__(self, size):
         self.temperature_low = 0
@@ -46,7 +46,7 @@ class Biome:
 # )
 
 
-class Arctic(Biome):
+class Arctic(BiomeType):
 
     def __init__(self, size):
         super().__init__(size)
