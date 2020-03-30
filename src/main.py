@@ -6,6 +6,13 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
+from kivy.uix.carousel import Carousel
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.scrollview import ScrollView
+
+
+from src.create_db import create_db
+from src.turn import TurnManager
 
 import sqlite3
 
@@ -29,8 +36,12 @@ class MainApp(App):
         main_screen = Screen(name='main')
         biom_screen = Screen(name='biom')
         supply_screen = Screen(name='supply')
+        self.biom_grid = GridLayout(cols=2)
+        # for i in range(10):
+        #     biom_grid.add_widget(Button(text='hue'))
         main_screen.add_widget(Button(text='main'))
-        biom_screen.add_widget(Button(text='biom'))
+        # biom_screen.add_widget(Button(text='biom'))
+        biom_screen.add_widget(self.biom_grid)
         # supply_screen.add_widget(Button(text='supply'))
         popup = Popup(title='Test popup',
                       content=Label(text='Hello world'),
@@ -41,14 +52,17 @@ class MainApp(App):
         self.sm.add_widget(supply_screen)
 
         to_biom = Button(text='to biom',
-                           on_press=lambda *args: self.switching_page(biom_screen.name))
+                         on_press=lambda *args: self.switching_page(biom_screen.name))
 
         to_main = Button(text='to main',
-                           on_press=lambda *args: self.switching_page(main_screen.name))
+                         on_press=lambda *args: self.switching_page(main_screen.name))
 
         to_supply = Button(text='to supply',
                            on_press=lambda *args: self.switching_page(supply_screen.name))
+        make_turn = Button(text='make_turn',
+                           on_press=self.make_turn)
 
+        button_box.add_widget(make_turn)
         button_box.add_widget(to_biom)
         button_box.add_widget(to_main)
         button_box.add_widget(to_supply)
@@ -60,8 +74,12 @@ class MainApp(App):
 
     def switching_page(self, destination):
         self.sm.current = destination
-        c = cursor.execute('select title from albums limit 1').fetchall()[0]
-        print(c)
+
+    def make_turn(self, button):
+        data = TurnManager.make_turn()
+        self.biom_grid.clear_widgets()
+        for item in data:
+            self.biom_grid.add_widget(Button(text=str(item)))
 
 
 if __name__ == "__main__":
