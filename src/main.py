@@ -9,10 +9,12 @@ from kivy.uix.label import Label
 from kivy.uix.carousel import Carousel
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.image import Image
 
 
 from src.create_db import create_db
 from src.turn import TurnManager
+from settings import SC_PATH
 
 import sqlite3
 
@@ -37,12 +39,8 @@ class MainApp(App):
         biom_screen = Screen(name='biom')
         supply_screen = Screen(name='supply')
         self.biom_grid = GridLayout(cols=2)
-        # for i in range(10):
-        #     biom_grid.add_widget(Button(text='hue'))
         main_screen.add_widget(Button(text='main'))
-        # biom_screen.add_widget(Button(text='biom'))
         biom_screen.add_widget(self.biom_grid)
-        # supply_screen.add_widget(Button(text='supply'))
         popup = Popup(title='Test popup',
                       content=Label(text='Hello world'),
                       size_hint=(None, None))
@@ -79,7 +77,17 @@ class MainApp(App):
         data = TurnManager.make_turn()
         self.biom_grid.clear_widgets()
         for item in data:
-            self.biom_grid.add_widget(Button(text=str(item)))
+            # inner_grid = GridLayout(cols=2, padding=5)
+            inner_grid = GridLayout(rows=2, padding=5)
+            for data_item in item:
+                bl = BoxLayout()
+                # bl.add_widget(Label(text=data_item))
+                print(SC_PATH + '/sc1.jpg')
+                bl.add_widget(Image(source=f'{SC_PATH}/{data_item}.png', size_hint=(1, 1),))
+                bl.add_widget(Label(text=str(item[data_item])))
+                inner_grid.add_widget(bl)
+            # self.biom_grid.add_widget(Button(text=str(item)))
+            self.biom_grid.add_widget(inner_grid)
 
 
 if __name__ == "__main__":
