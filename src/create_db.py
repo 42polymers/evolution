@@ -13,6 +13,7 @@ def create_db():
         biome.insert(0, game_id)
 
     cursor.execute("""CREATE TABLE biomes(
+    id integer primary key autoincrement not null,
     game_id integer,
     high_vegetation_ratio integer , humidity integer ,
     large_prey_ratio integer , low_vegetation_ratio integer ,
@@ -22,7 +23,7 @@ def create_db():
     )""")
 
     conn.commit()
-    cursor.executemany("INSERT INTO biomes VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", result_biomes)
+    cursor.executemany("INSERT INTO biomes VALUES (null,?,?,?,?,?,?,?,?,?,?,?,?)", result_biomes)
     conn.commit()
 
 

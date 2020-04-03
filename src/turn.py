@@ -22,6 +22,7 @@ class TurnManager:
     @classmethod
     def calculate_food(cls, biomes_data):
         return [{
+            'biome_id': bd['id'],
             'low_vegetation_volume': int(bd['biome_size'] * bd['low_vegetation_ratio'] * randint(80, 100) / 100),
             'medium_vegetation_volume': int(bd['biome_size'] * bd['medium_vegetation_ratio'] * randint(80, 100) / 100),
             'high_vegetation_volume': int(bd['biome_size'] * bd['high_vegetation_ratio'] * randint(60, 100) / 100),

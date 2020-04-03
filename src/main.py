@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.properties import StringProperty
 from kivy.properties import ObjectProperty
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -10,9 +11,11 @@ from kivy.uix.carousel import Carousel
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.image import Image
+from kivy.uix.behaviors.button import ButtonBehavior
 
 
 from src.create_db import create_db
+from src.helpers import switch_page
 from src.turn import TurnManager
 from settings import SC_PATH
 
@@ -21,6 +24,20 @@ import sqlite3
 
 conn = sqlite3.connect("evo.db")
 cursor = conn.cursor()
+
+
+class CustomScreen(Screen):
+    """Screen with custom abilities"""
+
+    def __lt__(self, other):
+        return self.name < other.name
+
+
+class InnerBiomeGrid(ButtonBehavior, GridLayout):
+    """Custom grid for biomes"""
+
+    biome_id = ObjectProperty('biom_id')
+    sm = ObjectProperty('sm')
 
 
 class MainApp(App):
@@ -35,10 +52,13 @@ class MainApp(App):
         statistic_box.add_widget(statistic_stack)
         button_box = BoxLayout(size_hint=(1, .1))
         self.sm = ScreenManager(size_hint=(1, .85))
-        main_screen = Screen(name='main')
-        biom_screen = Screen(name='biom')
-        supply_screen = Screen(name='supply')
+        main_screen = CustomScreen(name='main')
+        biom_screen = CustomScreen(name='biom')
+        supply_screen = CustomScreen(name='supply')
         self.biom_grid = GridLayout(cols=2)
+        self.unremovable_screens = sorted([
+            main_screen, biom_screen, supply_screen
+        ])
         main_screen.add_widget(Button(text='main'))
         biom_screen.add_widget(self.biom_grid)
         popup = Popup(title='Test popup',
@@ -50,13 +70,13 @@ class MainApp(App):
         self.sm.add_widget(supply_screen)
 
         to_biom = Button(text='to biom',
-                         on_press=lambda *args: self.switching_page(biom_screen.name))
+                         on_press=lambda *args: switch_page(self.sm, biom_screen.name))
 
         to_main = Button(text='to main',
-                         on_press=lambda *args: self.switching_page(main_screen.name))
+                         on_press=lambda *args: switch_page(self.sm, main_screen.name))
 
         to_supply = Button(text='to supply',
-                           on_press=lambda *args: self.switching_page(supply_screen.name))
+                           on_press=lambda *args: switch_page(self.sm, supply_screen.name))
         make_turn = Button(text='make_turn',
                            on_press=self.make_turn)
 
@@ -70,23 +90,28 @@ class MainApp(App):
         bl.add_widget(button_box)
         return bl
 
-    def switching_page(self, destination):
-        self.sm.current = destination
-
     def make_turn(self, button):
         data = TurnManager.make_turn()
         self.biom_grid.clear_widgets()
+        if sorted(self.sm.screens) != self.unremovable_screens:
+            self.sm.clear_widgets(
+                screens=[sc for sc in self.sm.screens if sc not in self.unremovable_screens]
+            )
         for item in data:
-            # inner_grid = GridLayout(cols=2, padding=5)
-            inner_grid = GridLayout(rows=2, padding=5)
+            biome_id = item.pop('biome_id')
+            inner_grid = InnerBiomeGrid(
+                rows=2, padding=5, biome_id=biome_id, sm=self.sm,
+                on_press=lambda obj: switch_page(self.sm, f'b{obj.biome_id}')
+            )
+            biome_screen = CustomScreen(name=f'b{biome_id}')
+            biome_screen.add_widget(Button(text=f'b{biome_id}'))
+            self.sm.add_widget(biome_screen)
+
             for data_item in item:
                 bl = BoxLayout()
-                # bl.add_widget(Label(text=data_item))
-                print(SC_PATH + '/sc1.jpg')
                 bl.add_widget(Image(source=f'{SC_PATH}/{data_item}.png', size_hint=(1, 1),))
                 bl.add_widget(Label(text=str(item[data_item])))
                 inner_grid.add_widget(bl)
-            # self.biom_grid.add_widget(Button(text=str(item)))
             self.biom_grid.add_widget(inner_grid)
 
 
