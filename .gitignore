@@ -130,3 +130,5 @@ dmypy.json
 .idea
 /evo.db
 /src/evo.db
+/.buildozer/
+/bin/

@@ -19,12 +19,6 @@ from src.helpers import switch_page
 from src.turn import TurnManager
 from settings import SC_PATH
 
-import sqlite3
-
-
-conn = sqlite3.connect("evo.db")
-cursor = conn.cursor()
-
 
 class CustomScreen(Screen):
     """Screen with custom abilities"""
@@ -77,10 +71,10 @@ class MainApp(App):
 
         to_supply = Button(text='to supply',
                            on_press=lambda *args: switch_page(self.sm, supply_screen.name))
-        make_turn = Button(text='make_turn',
-                           on_press=self.make_turn)
+        make_turn_btn = Button(text='make_turn',
+                           on_press=lambda *args: self.make_turn(*args))
 
-        button_box.add_widget(make_turn)
+        button_box.add_widget(make_turn_btn)
         button_box.add_widget(to_biom)
         button_box.add_widget(to_main)
         button_box.add_widget(to_supply)
@@ -113,7 +107,3 @@ class MainApp(App):
                 bl.add_widget(Label(text=str(item[data_item])))
                 inner_grid.add_widget(bl)
             self.biom_grid.add_widget(inner_grid)
-
-
-if __name__ == "__main__":
-    MainApp().run()
