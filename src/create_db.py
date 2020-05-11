@@ -47,18 +47,18 @@ def create_creatures():
     )""")
 
     cursor.execute("""CREATE TABLE creature_countable_params(
-    creature_id integer primary key autoincrement not null,
+    id integer primary key autoincrement not null,
     game_id integer NOT NULL,
     frame integer NOT NULL CHECK (frame BETWEEN 0 AND 10),
     musculature integer NOT NULL CHECK (musculature BETWEEN 0 AND 10),
-    FOREIGN KEY (creature_id) REFERENCES creatures(id) ON DELETE CASCADE 
+    FOREIGN KEY (id) REFERENCES creatures(id) ON DELETE CASCADE 
     )""")
 
     cursor.execute("""CREATE TABLE creature_flag_params(
-    creature_id integer primary key autoincrement not null,
+    id integer primary key autoincrement not null,
     game_id integer NOT NULL,
     warmblooded integer NOT NULL DEFAULT  0 CHECK (warmblooded IN (0, 1)),
-    FOREIGN KEY (creature_id) REFERENCES creatures(id) ON DELETE CASCADE
+    FOREIGN KEY (id) REFERENCES creatures(id) ON DELETE CASCADE
     )""")
 
     conn.commit()

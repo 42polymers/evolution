@@ -1,4 +1,3 @@
-# BIOMES = {}
 # |Boreal taiga_______Swamp_______________Jungle
 # |
 # |Tundra_____________Forest______________Savanna
@@ -59,11 +58,7 @@ class BiomeType:
         }
         return biome
 
-    # def is_stable(self):
-    #     return randint(0, 100) > self.stability
 
-
-    # def calculate_volume(self):
 # BIOMES = (
 #     Biome('Arctic', 0, 0, 2, 2),
 #     Biome('Tundra', 0, 3, 2, 6),
@@ -120,6 +115,3 @@ class Swamp(BiomeType):
 
 
 biomes_pool = (Arctic(), Steppe(), Swamp())
-
-def get_biome():
-    pass

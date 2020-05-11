@@ -2,9 +2,9 @@ import os
 import sqlite3
 
 
-# db_path = os.path.join(os.path.dirname(os.getcwd()), 'evo.db')
 db_path = 'evo.db'
 db_exists = os.path.isfile(db_path)
+
 
 def dict_factory(cursor, row):
     d = {}

@@ -1,23 +1,25 @@
 from kivy.app import App
-from kivy.properties import StringProperty
+from kivy.config import Config
 from kivy.properties import ObjectProperty
-from kivy.uix.button import Button
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.stacklayout import StackLayout
-from kivy.uix.popup import Popup
-from kivy.uix.label import Label
-from kivy.uix.carousel import Carousel
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.image import Image
 from kivy.uix.behaviors.button import ButtonBehavior
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.image import Image
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.stacklayout import StackLayout
 
-
+from settings import SC_PATH
 from src.create_db import create_db
 from src.helpers import switch_page
 from src.turn import TurnManager
-from settings import SC_PATH
+
+
+# TODO: dev settings. delete before compiling
+Config.set('graphics', 'width', '720')
+Config.set('graphics', 'height', '1280')
 
 
 class CustomScreen(Screen):
@@ -107,10 +109,9 @@ class MainApp(App):
             )
 
     def prepare_creatures(self, data):
-        print(data)
         for item in data:
             self.creatures_grid.add_widget(
-                self.create_inner_grid(item, 'c')
+                self.create_creature_grid(item, 'c')
             )
 
     def create_inner_grid(self, item, prefix):
@@ -126,6 +127,34 @@ class MainApp(App):
         for data_item in item:
             bl = BoxLayout()
             bl.add_widget(Image(source=f'{SC_PATH}/{data_item}.png', size_hint=(1, 1), ))
+            bl.add_widget(Label(text=str(item[data_item])))
+            inner_grid.add_widget(bl)
+        return inner_grid
+
+    def create_creature_grid(self, item, prefix):
+        grid_id = item.pop('id')
+        flag = item.pop('flag')
+        inner_grid = CustomInnerGrid(
+            rows=2, padding=5, grid_id=grid_id, sm=self.sm,
+            on_press=lambda obj: switch_page(self.sm, f'{prefix}{obj.grid_id}')
+        )
+        screen = CustomScreen(name=f'{prefix}{grid_id}')
+        bl = BoxLayout()
+        left_part = BoxLayout()
+        right_part = GridLayout(cols=3, padding=5)
+        for i in range(30):
+            right_part.add_widget(Button(
+                text=f'{i}',
+                size_hint_y=None,
+            ))
+        bl.add_widget(left_part)
+        bl.add_widget(right_part)
+        screen.add_widget(bl)
+        self.sm.add_widget(screen)
+
+        for data_item in item:
+            bl = BoxLayout()
+            bl.add_widget(Image(source=f'{SC_PATH}/mock.png', size_hint=(1, 1), ))
             bl.add_widget(Label(text=str(item[data_item])))
             inner_grid.add_widget(bl)
         return inner_grid
